@@ -85,7 +85,7 @@ namespace EventBus.AzureServiceBus
             }
             catch (MessagingEntityNotFoundException)
             {
-                logger.LogWarning("The messaging entity {eventName} Could not be found.", eventName)
+                logger.LogWarning("The messaging entity {eventName} Could not be found.", eventName);
             }
 
             logger.LogInformation("Unsubscribing from event{eventName}", eventName);
@@ -140,7 +140,7 @@ namespace EventBus.AzureServiceBus
 
             try
             {
-                var rule = managementClient.GetRuleAsync(EventBusConfig.DefaultTopicName, eventName, eventName).GetAwaiter().GetResult();
+                var rule = managementClient.GetRuleAsync(EventBusConfig.DefaultTopicName, GetSubName(eventName), eventName).GetAwaiter().GetResult();
                 ruleExists = rule != null;
             }
             catch (MessagingEntityNotFoundException)

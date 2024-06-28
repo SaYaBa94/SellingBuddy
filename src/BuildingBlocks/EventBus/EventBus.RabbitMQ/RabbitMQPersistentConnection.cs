@@ -13,9 +13,11 @@ namespace EventBus.RabbitMQ
     public class RabbitMQPersistentConnection : IDisposable
     {
         private readonly IConnectionFactory connectionFactory;
-        private readonly int retryCount;
         private IConnection connection;
+        private readonly int retryCount;
         private object lock_object = new object();
+        public bool IsConnected => connection != null && connection.IsOpen;
+        public bool _disposed;
 
         public RabbitMQPersistentConnection(IConnectionFactory connectionFactory, int retryCount = 5)
         {
@@ -23,8 +25,6 @@ namespace EventBus.RabbitMQ
             this.retryCount = retryCount;
         }
 
-        public bool IsConnected => connection != null && connection.IsOpen;
-        public bool _disposed;
 
         public IModel CreateModel()
         {
@@ -33,7 +33,7 @@ namespace EventBus.RabbitMQ
 
         public void Dispose()
         {
-            _disposed= true;
+            _disposed = true;
             connection.Dispose();
         }
 
@@ -52,7 +52,7 @@ namespace EventBus.RabbitMQ
                     connection = connectionFactory.CreateConnection();
                 });
 
-                if(IsConnected)
+                if (IsConnected)
                 {
                     connection.ConnectionShutdown += Connection_ConnectionShutdown;
                     connection.CallbackException += Connection_CallbackException;
@@ -69,7 +69,7 @@ namespace EventBus.RabbitMQ
         {
             if (_disposed) return;
             TryConnect();
-            
+
         }
 
         private void Connection_CallbackException(object sender, global::RabbitMQ.Client.Events.CallbackExceptionEventArgs e)
